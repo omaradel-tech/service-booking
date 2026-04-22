@@ -66,7 +66,7 @@ erDiagram
         int id PK
         string name
         text description
-        decimal price(10,2)
+        decimal price
         int duration_minutes
         boolean is_active
         timestamp created_at
@@ -78,7 +78,7 @@ erDiagram
         int id PK
         string name
         text description
-        decimal price(10,2)
+        decimal price
         boolean is_active
         timestamp created_at
         timestamp updated_at
