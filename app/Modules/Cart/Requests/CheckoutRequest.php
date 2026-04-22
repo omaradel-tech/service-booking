@@ -3,8 +3,11 @@
 namespace App\Modules\Cart\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use App\Core\Application\Rules\ActiveSubscriptionRule;
 use App\Core\Application\Rules\NoBookingOverlapRule;
+use App\Core\Application\Services\SubscriptionService;
+use App\Core\Application\Contracts\BookingRepositoryInterface;
 
 class CheckoutRequest extends FormRequest
 {
@@ -29,10 +32,32 @@ class CheckoutRequest extends FormRequest
                 'required',
                 'date',
                 'after:now',
-                new ActiveSubscriptionRule($this->user()),
-                new NoBookingOverlapRule($this->user(), $this->input('schedules.*.service_id'), $this->input('schedules.*.scheduled_at'))
+                new NoBookingOverlapRule(app(BookingRepositoryInterface::class))
             ],
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            // Check if user has active subscription
+            $subscriptionService = app(SubscriptionService::class);
+            $isActive = $subscriptionService->checkActive($this->user());
+            
+            // Debug: Log the subscription check result
+            Log::info('Checkout subscription check', [
+                'user_id' => $this->user()->id,
+                'is_active' => $isActive,
+                'subscription' => $subscriptionService->getCurrent($this->user())
+            ]);
+            
+            if (!$isActive) {
+                $validator->errors()->add('schedules', 'An active subscription is required to perform this action.');
+            }
+        });
     }
 
     /**

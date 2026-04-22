@@ -70,7 +70,10 @@ test('user gets 404 for non-existent service', function () {
 
     $response->assertStatus(404)
         ->assertJson([
-            'message' => 'Service not found',
+            'error' => [
+                'code' => 'NOT_FOUND',
+                'message' => 'Service not found',
+            ],
         ]);
 });
 

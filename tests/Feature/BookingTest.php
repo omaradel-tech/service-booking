@@ -45,10 +45,14 @@ test('user can create booking with active subscription', function () {
                 'service',
                 'can_be_canceled',
             ],
-            'message',
+            'meta' => [
+                'message',
+            ],
         ])
         ->assertJson([
-            'message' => 'Booking created successfully',
+            'meta' => [
+                'message' => 'Booking created successfully',
+            ],
         ]);
 
     $this->assertDatabaseHas('bookings', [
@@ -73,7 +77,10 @@ test('user cannot create booking without active subscription', function () {
 
     $response->assertStatus(400)
         ->assertJson([
-            'message' => 'Active subscription required to create booking',
+            'error' => [
+                'code' => 'BOOKING_ERROR',
+                'message' => 'Active subscription required to create booking',
+            ],
         ]);
 });
 
@@ -148,7 +155,9 @@ test('user can cancel their booking', function () {
 
     $response->assertStatus(200)
         ->assertJson([
-            'message' => 'Booking canceled successfully',
+            'meta' => [
+                'message' => 'Booking canceled successfully',
+            ],
         ]);
 
     $this->assertDatabaseHas('bookings', [
@@ -182,7 +191,10 @@ test('user cannot cancel booking that cannot be canceled', function () {
 
     $response->assertStatus(400)
         ->assertJson([
-            'message' => 'Booking cannot be canceled',
+            'error' => [
+                'code' => 'BOOKING_ERROR',
+                'message' => 'Booking cannot be canceled',
+            ],
         ]);
 });
 
@@ -206,7 +218,20 @@ test('booking validation fails with invalid data', function () {
     $response = $this->postJson('/api/v1/bookings', $invalidBookingData);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['service_id', 'scheduled_at']);
+        ->assertJson([
+            'error' => [
+                'code' => 'VALIDATION_ERROR',
+                'message' => 'The given data was invalid.',
+            ],
+        ])
+        ->assertJsonStructure([
+            'error' => [
+                'details' => [
+                    'service_id',
+                    'scheduled_at',
+                ],
+            ],
+        ]);
 });
 
 test('booking factory creates valid booking', function () {

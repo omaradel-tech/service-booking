@@ -57,7 +57,7 @@ class BookingController extends Controller
             ->orderBy('scheduled_at', 'desc')
             ->paginate($perPage);
 
-        return ApiResponse::paginated(new BookingResource($bookings));
+        return ApiResponse::paginated(BookingResource::collection($bookings));
     }
 
     /**
@@ -172,14 +172,20 @@ class BookingController extends Controller
             ->with('service')
             ->findOrFail($id);
 
-        Gate::authorize('cancel', $booking);
-
         try {
+            Gate::authorize('cancel', $booking);
             $this->bookingService->cancel($booking);
 
             return ApiResponse::success(
                 data: new BookingResource($booking),
                 meta: ['message' => 'Booking canceled successfully']
+            );
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return ApiResponse::error(
+                'BOOKING_ERROR',
+                'Booking cannot be canceled',
+                null,
+                400
             );
         } catch (\Exception $e) {
             return ApiResponse::error('BOOKING_ERROR', $e->getMessage(), status: 400);

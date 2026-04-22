@@ -21,9 +21,12 @@ class PackageService
      */
     public function listActive(): \Illuminate\Database\Eloquent\Collection
     {
-        return Cache::remember('packages.active', 3600, function () {
-            return $this->packageRepository->listActive();
-        });
+        // Temporarily disable caching to fix __PHP_Incomplete_Class issue
+        // return Cache::remember('packages.active', 3600, function () {
+        //     return $this->packageRepository->listActive();
+        // });
+        
+        return $this->packageRepository->listActive();
     }
 
     /**

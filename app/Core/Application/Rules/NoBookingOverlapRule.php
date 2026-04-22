@@ -20,7 +20,12 @@ class NoBookingOverlapRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $user = request()->user();
-        $serviceId = request()->input('service_id');
+        
+        // Extract service_id from the schedule item path
+        // $attribute will be something like "schedules.0.scheduled_at"
+        $schedulePath = str_replace('.scheduled_at', '', $attribute);
+        $serviceId = request()->input($schedulePath . '.service_id');
+        
         $scheduledAt = Carbon::parse($value);
 
         if (!$user || !$serviceId) {

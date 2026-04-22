@@ -74,7 +74,11 @@ class ServiceController extends Controller
     public function show(int $id): JsonResponse
     {
         $service = Service::where('is_active', true)
-            ->findOrFail($id);
+            ->find($id);
+
+        if (!$service) {
+            return ApiResponse::error('NOT_FOUND', 'Service not found', null, 404);
+        }
 
         return ApiResponse::success(new ServiceResource($service));
     }

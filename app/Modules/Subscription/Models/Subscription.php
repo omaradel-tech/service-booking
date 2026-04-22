@@ -7,6 +7,7 @@ use App\Core\Domain\Enums\SubscriptionType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 class Subscription extends Model
 {
@@ -42,8 +43,22 @@ class Subscription extends Model
      */
     public function isActive(): bool
     {
-        return $this->status === SubscriptionStatus::ACTIVE() 
-            && $this->ends_at->isFuture();
+        $statusCheck = $this->status == SubscriptionStatus::ACTIVE();
+        $futureCheck = $this->ends_at->isFuture();
+        
+        Log::info('Subscription isActive check', [
+            'subscription_id' => $this->id,
+            'status' => $this->status->getValue(),
+            'status_check' => $statusCheck,
+            'ends_at' => $this->ends_at->toIso8601String(),
+            'now' => now()->toIso8601String(),
+            'future_check' => $futureCheck,
+            'is_future_method' => $this->ends_at->isFuture(),
+            'ends_at_timestamp' => $this->ends_at->timestamp,
+            'now_timestamp' => now()->timestamp
+        ]);
+        
+        return $statusCheck && $futureCheck;
     }
 
     /**

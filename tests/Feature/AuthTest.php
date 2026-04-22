@@ -58,7 +58,19 @@ test('user cannot register with invalid email', function () {
     $response = $this->postJson('/api/v1/auth/register', $userData);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+        ->assertJson([
+            'error' => [
+                'code' => 'VALIDATION_ERROR',
+                'message' => 'The given data was invalid.',
+            ],
+        ])
+        ->assertJsonStructure([
+            'error' => [
+                'details' => [
+                    'email',
+                ],
+            ],
+        ]);
 });
 
 test('user cannot register with duplicate email', function () {
@@ -74,7 +86,19 @@ test('user cannot register with duplicate email', function () {
     $response = $this->postJson('/api/v1/auth/register', $userData);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+        ->assertJson([
+            'error' => [
+                'code' => 'VALIDATION_ERROR',
+                'message' => 'The given data was invalid.',
+            ],
+        ])
+        ->assertJsonStructure([
+            'error' => [
+                'details' => [
+                    'email',
+                ],
+            ],
+        ]);
 });
 
 test('user can login with valid credentials', function () {

@@ -37,7 +37,7 @@ class ApiResponse
     public static function paginated(JsonResource $resource): JsonResponse
     {
         return response()->json([
-            'data' => $resource->collection,
+            'data' => $resource->resource->items(),
             'meta' => [
                 'pagination' => [
                     'current_page' => $resource->resource->currentPage(),
