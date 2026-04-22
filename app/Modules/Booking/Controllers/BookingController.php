@@ -5,10 +5,13 @@ namespace App\Modules\Booking\Controllers;
 use App\Core\Application\DTOs\CreateBookingDTO;
 use App\Core\Application\Services\BookingService;
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
+use App\Modules\Booking\Models\Booking;
 use App\Modules\Booking\Requests\CreateBookingRequest;
 use App\Modules\Booking\Resources\BookingResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @group Bookings
@@ -45,13 +48,16 @@ class BookingController extends Controller
      *   ]
      * }
      */
-    public function index(Request $request): Response
+    public function index(Request $request): JsonResponse
     {
-        $bookings = $this->bookingService->getForUser($request->user());
+        $perPage = min($request->get('per_page', 15), 100);
+        
+        $bookings = Booking::where('user_id', $request->user()->id)
+            ->with('service')
+            ->orderBy('scheduled_at', 'desc')
+            ->paginate($perPage);
 
-        return response([
-            'data' => BookingResource::collection($bookings),
-        ]);
+        return ApiResponse::paginated(new BookingResource($bookings));
     }
 
     /**
@@ -81,7 +87,7 @@ class BookingController extends Controller
      *   "message": "Active subscription required to create booking"
      * }
      */
-    public function store(CreateBookingRequest $request): Response
+    public function store(CreateBookingRequest $request): JsonResponse
     {
         try {
             $dto = new CreateBookingDTO(
@@ -93,14 +99,13 @@ class BookingController extends Controller
             $booking = $this->bookingService->create($dto);
             $booking->load('service');
 
-            return response([
-                'data' => new BookingResource($booking),
-                'message' => 'Booking created successfully',
-            ], 201);
+            return ApiResponse::success(
+                data: new BookingResource($booking),
+                meta: ['message' => 'Booking created successfully'],
+                status: 201
+            );
         } catch (\Exception $e) {
-            return response([
-                'message' => $e->getMessage(),
-            ], 400);
+            return ApiResponse::error('BOOKING_ERROR', $e->getMessage(), status: 400);
         }
     }
 
@@ -129,20 +134,15 @@ class BookingController extends Controller
      *   "message": "Booking not found"
      * }
      */
-    public function show(int $id, Request $request): Response
+    public function show(int $id, Request $request): JsonResponse
     {
-        $bookings = $this->bookingService->getForUser($request->user());
-        $booking = $bookings->firstWhere('id', $id);
+        $booking = Booking::where('user_id', $request->user()->id)
+            ->with('service')
+            ->findOrFail($id);
 
-        if (!$booking) {
-            return response([
-                'message' => 'Booking not found',
-            ], 404);
-        }
+        Gate::authorize('view', $booking);
 
-        return response([
-            'data' => new BookingResource($booking),
-        ]);
+        return ApiResponse::success(new BookingResource($booking));
     }
 
     /**
@@ -166,28 +166,23 @@ class BookingController extends Controller
      *   "message": "Booking not found"
      * }
      */
-    public function cancel(int $id, Request $request): Response
+    public function cancel(int $id, Request $request): JsonResponse
     {
-        $bookings = $this->bookingService->getForUser($request->user());
-        $booking = $bookings->firstWhere('id', $id);
+        $booking = Booking::where('user_id', $request->user()->id)
+            ->with('service')
+            ->findOrFail($id);
 
-        if (!$booking) {
-            return response([
-                'message' => 'Booking not found',
-            ], 404);
-        }
+        Gate::authorize('cancel', $booking);
 
         try {
             $this->bookingService->cancel($booking);
 
-            return response([
-                'data' => new BookingResource($booking),
-                'message' => 'Booking canceled successfully',
-            ]);
+            return ApiResponse::success(
+                data: new BookingResource($booking),
+                meta: ['message' => 'Booking canceled successfully']
+            );
         } catch (\Exception $e) {
-            return response([
-                'message' => $e->getMessage(),
-            ], 400);
+            return ApiResponse::error('BOOKING_ERROR', $e->getMessage(), status: 400);
         }
     }
 }

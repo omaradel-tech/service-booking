@@ -4,9 +4,11 @@ namespace App\Modules\Service\Controllers;
 
 use App\Core\Application\Contracts\ServiceRepositoryInterface;
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
+use App\Modules\Service\Models\Service;
 use App\Modules\Service\Resources\ServiceResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 
 /**
  * @group Services
@@ -37,13 +39,15 @@ class ServiceController extends Controller
      *   ]
      * }
      */
-    public function index(): Response
+    public function index(Request $request): JsonResponse
     {
-        $services = $this->serviceRepository->listActive();
+        $perPage = min($request->get('per_page', 15), 100);
+        
+        $services = Service::where('is_active', true)
+            ->orderBy('name')
+            ->paginate($perPage);
 
-        return response([
-            'data' => ServiceResource::collection($services),
-        ]);
+        return ApiResponse::paginated(new ServiceResource($services));
     }
 
     /**
@@ -67,18 +71,11 @@ class ServiceController extends Controller
      *   "message": "Service not found"
      * }
      */
-    public function show(int $id): Response
+    public function show(int $id): JsonResponse
     {
-        $service = $this->serviceRepository->find($id);
+        $service = Service::where('is_active', true)
+            ->findOrFail($id);
 
-        if (!$service) {
-            return response([
-                'message' => 'Service not found',
-            ], 404);
-        }
-
-        return response([
-            'data' => new ServiceResource($service),
-        ]);
+        return ApiResponse::success(new ServiceResource($service));
     }
 }
