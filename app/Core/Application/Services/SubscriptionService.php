@@ -64,15 +64,13 @@ class SubscriptionService
      */
     public function expireOverdue(): int
     {
-        $expiredCount = 0;
+        Log::info('Starting subscription expiry process');
         
-        // This would typically be called by a scheduled job
-        // For now, we'll implement a basic version that finds expired subscriptions
+        $expiredCount = $this->subscriptionRepository->expireOverdue();
         
-        Log::info('Checking for overdue subscriptions to expire');
-        
-        // In a real implementation, this would query the repository for expired subscriptions
-        // and update their status to EXPIRED
+        Log::channel('subscription')->info('Subscription expiry completed', [
+            'expired_count' => $expiredCount,
+        ]);
         
         return $expiredCount;
     }

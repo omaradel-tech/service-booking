@@ -61,4 +61,27 @@ class EloquentSubscriptionRepository implements SubscriptionRepositoryInterface
     {
         return $subscription->delete();
     }
+
+    /**
+     * Expire overdue subscriptions.
+     */
+    public function expireOverdue(): int
+    {
+        $expiredCount = 0;
+
+        // Find subscriptions that are past their grace period and still active
+        $overdueSubscriptions = Subscription::where('status', SubscriptionStatus::ACTIVE())
+            ->where('grace_ends_at', '<', now())
+            ->get();
+
+        foreach ($overdueSubscriptions as $subscription) {
+            $this->expire($subscription);
+            $expiredCount++;
+
+            // Fire subscription expired event
+            event(new \App\Modules\Subscription\Events\SubscriptionExpired($subscription));
+        }
+
+        return $expiredCount;
+    }
 }

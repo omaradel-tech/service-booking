@@ -36,4 +36,9 @@ interface SubscriptionRepositoryInterface
      * Delete subscription.
      */
     public function delete(Subscription $subscription): bool;
+
+    /**
+     * Expire overdue subscriptions.
+     */
+    public function expireOverdue(): int;
 }

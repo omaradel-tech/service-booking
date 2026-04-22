@@ -4,6 +4,7 @@ namespace App\Modules\Booking\Observers;
 
 use App\Modules\Booking\Models\Booking;
 use App\Modules\Booking\Jobs\SendBookingConfirmation;
+use App\Core\Domain\Enums\BookingStatus;
 use Illuminate\Support\Facades\Log;
 
 class BookingObserver
@@ -36,9 +37,9 @@ class BookingObserver
             ]);
 
             // Send notification for status changes if needed
-            if ($booking->status === 'confirmed') {
+            if ($booking->status === BookingStatus::CONFIRMED) {
                 // Could dispatch a job to send confirmation
-            } elseif ($booking->status === 'canceled') {
+            } elseif ($booking->status === BookingStatus::CANCELED) {
                 // Could dispatch a job to send cancellation notice
             }
         }
