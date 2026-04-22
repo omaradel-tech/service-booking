@@ -7,6 +7,7 @@ use App\Core\Domain\Enums\SubscriptionStatus;
 use App\Core\Domain\Enums\SubscriptionType;
 use App\Models\User;
 use App\Modules\Subscription\Models\Subscription;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SubscriptionService
@@ -20,29 +21,31 @@ class SubscriptionService
      */
     public function createTrial(User $user): Subscription
     {
-        // Check if user already has an active subscription
-        $existingSubscription = $this->subscriptionRepository->getActiveForUser($user);
-        if ($existingSubscription) {
-            throw new \Exception('User already has an active subscription');
-        }
+        return DB::transaction(function () use ($user) {
+            // Check if user already has an active subscription
+            $existingSubscription = $this->subscriptionRepository->getActiveForUser($user);
+            if ($existingSubscription) {
+                throw new \Exception('User already has an active subscription');
+            }
 
-        $trialData = [
-            'user_id' => $user->id,
-            'type' => SubscriptionType::TRIAL(),
-            'status' => SubscriptionStatus::ACTIVE(),
-            'starts_at' => now(),
-            'ends_at' => now()->addDays(30), // 30-day trial
-            'grace_ends_at' => now()->addDays(37), // 7-day grace period
-        ];
+            $trialData = [
+                'user_id' => $user->id,
+                'type' => SubscriptionType::TRIAL(),
+                'status' => SubscriptionStatus::ACTIVE(),
+                'starts_at' => now(),
+                'ends_at' => now()->addDays(30), // 30-day trial
+                'grace_ends_at' => now()->addDays(37), // 7-day grace period
+            ];
 
-        $subscription = $this->subscriptionRepository->create($trialData);
-        
-        Log::info('Trial subscription created', [
-            'user_id' => $user->id,
-            'subscription_id' => $subscription->id,
-        ]);
+            $subscription = $this->subscriptionRepository->create($trialData);
+            
+            Log::info('Trial subscription created', [
+                'user_id' => $user->id,
+                'subscription_id' => $subscription->id,
+            ]);
 
-        return $subscription;
+            return $subscription;
+        });
     }
 
     /**
@@ -80,24 +83,26 @@ class SubscriptionService
      */
     public function cancel(User $user): bool
     {
-        $subscription = $this->subscriptionRepository->getActiveForUser($user);
-        
-        if (!$subscription) {
-            throw new \Exception('No active subscription found');
-        }
+        return DB::transaction(function () use ($user) {
+            $subscription = $this->subscriptionRepository->getActiveForUser($user);
+            
+            if (!$subscription) {
+                throw new \Exception('No active subscription found');
+            }
 
-        $updated = $this->subscriptionRepository->update($subscription, [
-            'status' => SubscriptionStatus::CANCELED(),
-        ]);
-
-        if ($updated) {
-            Log::info('Subscription canceled', [
-                'user_id' => $user->id,
-                'subscription_id' => $subscription->id,
+            $updated = $this->subscriptionRepository->update($subscription, [
+                'status' => SubscriptionStatus::CANCELED(),
             ]);
-        }
 
-        return $updated;
+            if ($updated) {
+                Log::info('Subscription canceled', [
+                    'user_id' => $user->id,
+                    'subscription_id' => $subscription->id,
+                ]);
+            }
+
+            return $updated;
+        });
     }
 
     /**

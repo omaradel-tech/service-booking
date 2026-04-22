@@ -35,7 +35,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum', 'throttle:api')->group(function () {
         // Booking routes
         Route::get('/bookings', [\App\Modules\Booking\Controllers\BookingController::class, 'index']);
-        Route::post('/bookings', [\App\Modules\Booking\Controllers\BookingController::class, 'store'])->middleware('throttle:booking');
+        Route::post('/bookings', [\App\Modules\Booking\Controllers\BookingController::class, 'store'])->middleware('throttle:booking', 'idempotent');
         Route::get('/bookings/{id}', [\App\Modules\Booking\Controllers\BookingController::class, 'show']);
         Route::patch('/bookings/{id}/cancel', [\App\Modules\Booking\Controllers\BookingController::class, 'cancel']);
 
@@ -46,12 +46,12 @@ Route::prefix('v1')->group(function () {
         Route::delete('/cart/items/{id}', [\App\Modules\Cart\Controllers\CartController::class, 'removeItem']);
 
         // Checkout route
-        Route::post('/checkout', [\App\Modules\Cart\Controllers\CheckoutController::class, 'checkout'])->middleware('throttle:checkout');
+        Route::post('/checkout', [\App\Modules\Cart\Controllers\CheckoutController::class, 'checkout'])->middleware('throttle:checkout', 'idempotent');
 
         // Subscription routes
         Route::get('/subscriptions/current', [\App\Modules\Subscription\Controllers\SubscriptionController::class, 'current']);
-        Route::post('/subscriptions/start-trial', [\App\Modules\Subscription\Controllers\SubscriptionController::class, 'startTrial']);
-        Route::post('/subscriptions/cancel', [\App\Modules\Subscription\Controllers\SubscriptionController::class, 'cancel']);
+        Route::post('/subscriptions/start-trial', [\App\Modules\Subscription\Controllers\SubscriptionController::class, 'startTrial'])->middleware('idempotent');
+        Route::post('/subscriptions/cancel', [\App\Modules\Subscription\Controllers\SubscriptionController::class, 'cancel'])->middleware('idempotent');
         Route::get('/subscriptions/check', [\App\Modules\Subscription\Controllers\SubscriptionController::class, 'check']);
     });
 });

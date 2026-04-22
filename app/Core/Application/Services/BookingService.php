@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Modules\Booking\Models\Booking;
 use App\Modules\Booking\Jobs\SendBookingConfirmation;
 use App\Modules\Service\Models\Service;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class BookingService
@@ -24,44 +25,47 @@ class BookingService
      */
     public function create(CreateBookingDTO $dto): Booking
     {
-        // Validate user has active subscription
-        if (!$this->subscriptionRepository->getActiveForUser($dto->user)) {
-            throw new \Exception('Active subscription required to create booking');
-        }
+        return DB::transaction(function () use ($dto) {
+            // Validate user has active subscription
+            if (!$this->subscriptionRepository->getActiveForUser($dto->user)) {
+                throw new \Exception('Active subscription required to create booking');
+            }
 
-        // Validate scheduled time is in the future
-        if ($dto->scheduledAt->isPast()) {
-            throw new \Exception('Booking time must be in the future');
-        }
+            // Validate scheduled time is in the future
+            if ($dto->scheduledAt->isPast()) {
+                throw new \Exception('Booking time must be in the future');
+            }
 
-        // Check for overlapping bookings
-        $service = Service::findOrFail($dto->serviceId);
-        $endTime = $dto->scheduledAt->copy()->addMinutes($service->duration_minutes);
-        
-        if ($this->bookingRepository->hasOverlap($dto->user, $dto->scheduledAt, $endTime)) {
-            throw new \Exception('Booking time conflicts with existing booking');
-        }
+            // Lock service row for update to prevent concurrent bookings
+            $service = Service::whereKey($dto->serviceId)->lockForUpdate()->firstOrFail();
+            $endTime = $dto->scheduledAt->copy()->addMinutes($service->duration_minutes);
+            
+            // Re-check for overlapping bookings within transaction
+            if ($this->bookingRepository->hasOverlap($dto->user, $dto->scheduledAt, $endTime)) {
+                throw new \Exception('Booking time conflicts with existing booking');
+            }
 
-        $bookingData = [
-            'user_id' => $dto->user->id,
-            'service_id' => $dto->serviceId,
-            'scheduled_at' => $dto->scheduledAt,
-            'status' => BookingStatus::PENDING(),
-        ];
+            $bookingData = [
+                'user_id' => $dto->user->id,
+                'service_id' => $dto->serviceId,
+                'scheduled_at' => $dto->scheduledAt,
+                'status' => BookingStatus::PENDING(),
+            ];
 
-        $booking = $this->bookingRepository->create($bookingData);
+            $booking = $this->bookingRepository->create($bookingData);
 
-        // Dispatch confirmation job
-        SendBookingConfirmation::dispatch($booking);
+            // Dispatch confirmation job
+            SendBookingConfirmation::dispatch($booking);
 
-        Log::info('Booking created', [
-            'user_id' => $dto->user->id,
-            'booking_id' => $booking->id,
-            'service_id' => $dto->serviceId,
-            'scheduled_at' => $dto->scheduledAt,
-        ]);
+            Log::info('Booking created', [
+                'user_id' => $dto->user->id,
+                'booking_id' => $booking->id,
+                'service_id' => $dto->serviceId,
+                'scheduled_at' => $dto->scheduledAt,
+            ]);
 
-        return $booking;
+            return $booking;
+        });
     }
 
     /**

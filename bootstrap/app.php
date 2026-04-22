@@ -23,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api([
             \App\Http\Middleware\LogApiRequests::class,
         ]);
+
+        $middleware->alias([
+            'idempotent' => \App\Http\Middleware\IdempotencyKey::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (DomainException $e) {
