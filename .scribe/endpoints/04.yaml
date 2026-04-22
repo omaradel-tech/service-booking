@@ -1,0 +1,319 @@
+name: Cart
+description: |-
+
+  Cart management endpoints for adding, updating, and removing items from the shopping cart.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/cart
+    metadata:
+      custom: []
+      groupName: Cart
+      groupDescription: |-
+
+        Cart management endpoints for adding, updating, and removing items from the shopping cart.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Get user's cart"
+      description: "Returns the authenticated user's shopping cart with all items."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "data": {
+              "id": 1,
+              "user_id": 1,
+              "total_price": "300.00",
+              "items": [
+                {
+                  "id": 1,
+                  "item_type": "service",
+                  "item_id": 1,
+                  "quantity": 2,
+                  "item": {
+                    "id": 1,
+                    "name": "AC Repair",
+                    "price": "150.00"
+                  }
+                }
+              ]
+            }
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/cart/items
+    metadata:
+      custom: []
+      groupName: Cart
+      groupDescription: |-
+
+        Cart management endpoints for adding, updating, and removing items from the shopping cart.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Add item to cart'
+      description: "Adds a service or package to the user's cart."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      item_type:
+        custom: []
+        name: item_type
+        description: ''
+        required: true
+        example: service
+        type: string
+        enumValues:
+          - service
+          - package
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      item_id:
+        custom: []
+        name: item_id
+        description: 'Must be at least 1.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      quantity:
+        custom: []
+        name: quantity
+        description: 'Must be at least 1. Must not be greater than 10.'
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      item_type: service
+      item_id: 16
+      quantity: 2
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+            "data": {
+              "id": 1,
+              "item_type": "service",
+              "item_id": 1,
+              "quantity": 2,
+              "total_price": "300.00"
+            },
+            "message": "Item added to cart successfully"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/v1/cart/items/{id}'
+    metadata:
+      custom: []
+      groupName: Cart
+      groupDescription: |-
+
+        Cart management endpoints for adding, updating, and removing items from the shopping cart.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update cart item quantity'
+      description: 'Updates the quantity of an existing cart item.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Cart item ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      quantity:
+        custom: []
+        name: quantity
+        description: 'Must be at least 1. Must not be greater than 10.'
+        required: true
+        example: 6
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      quantity: 6
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "data": {
+              "id": 1,
+              "quantity": 3,
+              "total_price": "450.00"
+            },
+            "message": "Cart item updated successfully"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 400
+        content: |-
+          {
+            "message": "Quantity must be at least 1"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Cart item not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/cart/items/{id}'
+    metadata:
+      custom: []
+      groupName: Cart
+      groupDescription: |-
+
+        Cart management endpoints for adding, updating, and removing items from the shopping cart.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Remove item from cart'
+      description: "Removes an item from the user's cart."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Cart item ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "message": "Item removed from cart successfully"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Cart item not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null

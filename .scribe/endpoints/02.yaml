@@ -1,0 +1,144 @@
+name: Packages
+description: |-
+
+  Package management endpoints for browsing service bundles.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/packages
+    metadata:
+      custom: []
+      groupName: Packages
+      groupDescription: |-
+
+        Package management endpoints for browsing service bundles.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List all active packages'
+      description: 'Returns a list of all currently active service packages with their included services.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Complete Home Maintenance",
+                "price": "500.00",
+                "is_active": true,
+                "services_total_price": "600.00",
+                "discount_amount": "100.00",
+                "discount_percentage": "16.67",
+                "services": [
+                  {
+                    "id": 1,
+                    "name": "AC Repair",
+                    "price": "150.00"
+                  }
+                ]
+              }
+            ]
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/packages/{id}'
+    metadata:
+      custom: []
+      groupName: Packages
+      groupDescription: |-
+
+        Package management endpoints for browsing service bundles.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get package details'
+      description: 'Returns detailed information about a specific package including all included services.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Package ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "data": {
+              "id": 1,
+              "name": "Complete Home Maintenance",
+              "price": "500.00",
+              "is_active": true,
+              "services_total_price": "600.00",
+              "discount_amount": "100.00",
+              "discount_percentage": "16.67",
+              "services": [
+                {
+                  "id": 1,
+                  "name": "AC Repair",
+                  "price": "150.00",
+                  "description": "Complete air conditioning repair service",
+                  "duration_minutes": 120
+                }
+              ]
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Package not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

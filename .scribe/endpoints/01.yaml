@@ -1,0 +1,126 @@
+name: Services
+description: |-
+
+  Service management endpoints for browsing available maintenance services.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/services
+    metadata:
+      custom: []
+      groupName: Services
+      groupDescription: |-
+
+        Service management endpoints for browsing available maintenance services.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List all active services'
+      description: 'Returns a list of all currently active maintenance services.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "AC Repair",
+                "description": "Complete air conditioning repair service",
+                "price": "150.00",
+                "duration_minutes": 120,
+                "is_active": true
+              }
+            ]
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/services/{id}'
+    metadata:
+      custom: []
+      groupName: Services
+      groupDescription: |-
+
+        Service management endpoints for browsing available maintenance services.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get service details'
+      description: 'Returns detailed information about a specific service.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Service ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "data": {
+              "id": 1,
+              "name": "AC Repair",
+              "description": "Complete air conditioning repair service",
+              "price": "150.00",
+              "duration_minutes": 120,
+              "is_active": true
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Service not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

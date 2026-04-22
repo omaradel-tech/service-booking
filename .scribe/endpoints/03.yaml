@@ -1,0 +1,313 @@
+name: Bookings
+description: |-
+
+  Booking management endpoints for scheduling and managing service appointments.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/bookings
+    metadata:
+      custom: []
+      groupName: Bookings
+      groupDescription: |-
+
+        Booking management endpoints for scheduling and managing service appointments.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List user bookings'
+      description: 'Returns all bookings for the authenticated user.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "data": [
+              {
+                "id": 1,
+                "user_id": 1,
+                "service_id": 1,
+                "scheduled_at": "2023-01-15T10:00:00.000000Z",
+                "status": "pending",
+                "service": {
+                  "id": 1,
+                  "name": "AC Repair",
+                  "price": "150.00"
+                }
+              }
+            ]
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/bookings
+    metadata:
+      custom: []
+      groupName: Bookings
+      groupDescription: |-
+
+        Booking management endpoints for scheduling and managing service appointments.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Create a new booking'
+      description: 'Creates a new booking for a service at the specified time.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      service_id:
+        custom: []
+        name: service_id
+        description: 'The <code>id</code> of an existing record in the services table.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      scheduled_at:
+        custom: []
+        name: scheduled_at
+        description: 'Must be a valid date. Must be a date after <code>now</code>.'
+        required: true
+        example: '2052-05-15'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      service_id: 16
+      scheduled_at: '2052-05-15'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+            "data": {
+              "id": 1,
+              "user_id": 1,
+              "service_id": 1,
+              "scheduled_at": "2023-01-15T10:00:00.000000Z",
+              "status": "pending",
+              "service": {
+                "id": 1,
+                "name": "AC Repair",
+                "price": "150.00"
+              }
+            },
+            "message": "Booking created successfully"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 400
+        content: |-
+          {
+            "message": "Active subscription required to create booking"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/bookings/{id}'
+    metadata:
+      custom: []
+      groupName: Bookings
+      groupDescription: |-
+
+        Booking management endpoints for scheduling and managing service appointments.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get booking details'
+      description: 'Returns detailed information about a specific booking.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Booking ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "data": {
+              "id": 1,
+              "user_id": 1,
+              "service_id": 1,
+              "scheduled_at": "2023-01-15T10:00:00.000000Z",
+              "status": "pending",
+              "service": {
+                "id": 1,
+                "name": "AC Repair",
+                "price": "150.00"
+              }
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Booking not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/v1/bookings/{id}/cancel'
+    metadata:
+      custom: []
+      groupName: Bookings
+      groupDescription: |-
+
+        Booking management endpoints for scheduling and managing service appointments.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Cancel a booking'
+      description: 'Cancels a booking if it can be canceled (pending or confirmed status and future time).'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Booking ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "data": {
+              "id": 1,
+              "status": "canceled"
+            },
+            "message": "Booking canceled successfully"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 400
+        content: |-
+          {
+            "message": "Booking cannot be canceled"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Booking not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
